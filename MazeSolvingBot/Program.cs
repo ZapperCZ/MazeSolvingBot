@@ -14,11 +14,10 @@ namespace MazeSolvingBot
         static List<int> Path = new List<int>();
         static void Main(string[] args)
         {
+            Console.WriteLine("Legend: 0 = Free Tile | 1 = Wall | 2 = Start | 3 = End | 5 = Path");
             mazeArray = new int[mazeX, mazeY, 3];
             ConvertToMaze();
             PrintMaze(0);
-            PrintMaze(1);
-            PrintMaze(2);
             for (int i = 0; i < mazeX; i++)
             {
                 for (int j = 0; j < mazeY; j++)
@@ -27,13 +26,8 @@ namespace MazeSolvingBot
                         CheckNearbyTiles(i,j);
                 }
             }
-            PrintMaze(0);
-            PrintMaze(1);
-            PrintMaze(2);
 
             ExtractPath();
-
-            Console.WriteLine("\n");
 
             VisualizePath();
 
@@ -53,11 +47,7 @@ namespace MazeSolvingBot
                 {
                     if (i >= 0 && j >= 0 && i < mazeX && j < mazeY)                         //Withing maze boundaries
                     {
-                        if ((i == x - 1 && j == y + 1) || (i == x+1 && j == y+1) || (i == x - 1 && j == y - 1) || (i == x + 1 && j == y - 1))    
-                        {
-                            //Isn't a valid move
-                        }
-                        else
+                        if (!((i == x - 1 && j == y + 1) || (i == x+1 && j == y+1) || (i == x - 1 && j == y - 1) || (i == x + 1 && j == y - 1)))    
                         {
                             if (mazeArray[i, j, 1] == -1 && mazeArray[i, j, 0] != 1)        //Hasn't been checked yet and isn't a wall
                             {
@@ -155,7 +145,7 @@ namespace MazeSolvingBot
         }
         static void PrintMaze(int layer)
         {
-            Console.WriteLine($"\n Layer: {layer} \n");
+            Console.WriteLine($"\nLayer: {layer} \n");
             for (int i = 0; i < mazeX; i++)
             {
                 for (int j = 0; j < mazeY; j++)
