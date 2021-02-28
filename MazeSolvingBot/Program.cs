@@ -10,7 +10,8 @@ namespace MazeSolvingBot
     {
         static int mazeX = 7;                       //Vertical size
         static int mazeY = 9;                       //Horizontal size
-        static int[,,] mazeArray;                   //Layer 0 - 0 = Free Tile | 1 = Wall | 2 = Start | 3 = End || Layer 1 - Stores global tile index || Layer 2 - Stores what tile it was uncovered from
+        static int[,,] mazeArray;                   //Layer 0 - 0 = Free Tile | 1 = Wall | 2 = Start | 3 = End || Layer 1 - Stores what tile it was uncovered from || Layer 2 - Stores global tile index
+        static List<int> Path = new List<int>();
         static void Main(string[] args)
         {
             mazeArray = new int[mazeX, mazeY, 3];
@@ -22,13 +23,21 @@ namespace MazeSolvingBot
             {
                 for (int j = 0; j < mazeY; j++)
                 {
-                    if (mazeArray[i, j, 2] == 2)        //Start
+                    if (mazeArray[i, j, 0] == 2)        //Start
                         CheckNearbyTiles(i,j);
                 }
             }
             PrintMaze(0);
             PrintMaze(1);
             PrintMaze(2);
+
+            ExtractPath();
+
+            Console.WriteLine("\n");
+
+            VisualizePath();
+
+            PrintMaze(0);
 
             Console.ReadLine();
         }
@@ -81,6 +90,69 @@ namespace MazeSolvingBot
                 }
             }
         }
+        static void ExtractPath()
+        {
+            bool startFound = false;
+            int x, y;
+            x = y = 0;
+            for (int i = 0; i < mazeX; i++)
+            {
+                for (int j = 0; j < mazeY; j++)
+                {
+                    if (mazeArray[i, j, 0] == 3)        //End
+                    {        
+                        x = i;
+                        y = j;
+                        Path.Add(mazeArray[x, y, 1]);
+                    }
+                }
+            }
+            while (!startFound)
+            {
+                for (int i = x - 1; i <= x + 1; i++)
+                {
+                    for (int j = y - 1; j <= y + 1; j++)
+                    {
+                        if (i >= 0 && j >= 0 && i < mazeX && j < mazeY)
+                        {
+                            if (mazeArray[x, y, 1] == mazeArray[i, j, 2] && !Path.Contains(mazeArray[i, j, 1]))
+                            {
+                                x = i;
+                                y = j;
+                                Path.Add(mazeArray[i, j, 1]);
+                                if(mazeArray[x,y,1] == -2)
+                                {
+                                    startFound = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Path.Reverse();
+        }
+        static void VisualizePath()
+        {
+            int index = 0;
+
+            while (index<Path.Count)
+            {
+                for (int i = 0; i < mazeX; i++)
+                {
+                    for (int j = 0; j < mazeY; j++)
+                    {
+                        if (mazeArray[i, j, 1] == Path[index])
+                        {
+                            if(mazeArray[i, j, 0] != 2 && mazeArray[i, j, 0] != 3)
+                                mazeArray[i, j, 0] = 5;
+                            index++;
+                            goto endloop;                           //Yes, I am aware that goto absolutely shouldn't be used, unless it is extremely necessary
+                        }
+                    }
+                }
+                endloop:;
+            }
+        }
         static void PrintMaze(int layer)
         {
             Console.WriteLine($"\n Layer: {layer} \n");
@@ -89,16 +161,6 @@ namespace MazeSolvingBot
                 for (int j = 0; j < mazeY; j++)
                 {
                     Console.Write(mazeArray[i,j,layer] + " ");
-                    /*
-                    if (mazeArray[i, j, 0] == 2)
-                        Console.Write('S');
-                    else if (mazeArray[i, j, 0] == 3)
-                        Console.Write('F');
-                    else if (mazeArray[i, j, 0] == 1)
-                        Console.Write('■');
-                    else
-                        Console.Write('o');
-                    */
                 }
                 Console.WriteLine();
             }
