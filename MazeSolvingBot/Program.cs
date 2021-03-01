@@ -124,8 +124,9 @@ namespace MazeSolvingBot
         static void VisualizePath()
         {
             int index = 0;
+            bool endFound = false;
 
-            while (index<Path.Count)
+            while (!endFound)
             {
                 for (int i = 0; i < mazeX; i++)
                 {
@@ -133,14 +134,16 @@ namespace MazeSolvingBot
                     {
                         if (mazeArray[i, j, 1] == Path[index])
                         {
-                            if(mazeArray[i, j, 0] != 2 && mazeArray[i, j, 0] != 3)
+                            if (mazeArray[i, j, 0] != 2 && mazeArray[i, j, 0] != 3)
                                 mazeArray[i, j, 0] = 5;
-                            index++;
-                            goto endloop;                           //Yes, I am aware that goto absolutely shouldn't be used, unless it is extremely necessary
+                            else if (mazeArray[i, j, 0] == 3)
+                                endFound = true;
+                            
+                           
                         }
                     }
                 }
-                endloop:;
+                index++;
             }
         }
         static void PrintMaze(int layer)
